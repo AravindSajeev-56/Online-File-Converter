@@ -18,15 +18,26 @@ class TestWebApi(unittest.TestCase):
         self.client = app.test_client()
 
     def test_index_page(self):
-        """Verify homepage loads with title, theme switcher, and features."""
+        """Verify homepage loads with title, theme switcher, share button, proper section order, and no FAQ."""
         res = self.client.get("/")
         self.assertEqual(res.status_code, 200)
         html = res.data.decode("utf-8")
         self.assertIn("56 File Converter", html)
         self.assertIn("themeToggle", html)
+        self.assertIn("shareBtn", html)
         self.assertIn("100% Free Forever", html)
         self.assertIn("No Daily Limits", html)
         self.assertIn("100% Secure", html)
+        
+        # Verify section order: How It Works -> Supported Formats -> Why Choose 56 File Converter
+        pos_how = html.find('id="howItWorks"')
+        pos_formats = html.find('id="formats"')
+        pos_features = html.find('id="features"')
+        self.assertTrue(pos_how != -1 and pos_formats != -1 and pos_features != -1)
+        self.assertTrue(pos_how < pos_formats < pos_features)
+
+        # Verify FAQ was removed
+        self.assertNotIn("Frequently Asked Questions", html)
 
     def test_api_formats(self):
         """Verify formats API returns mapping."""

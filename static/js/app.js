@@ -27,6 +27,7 @@
   const convertAllBtn = document.getElementById('convertAllBtn');
   const downloadAllBtn = document.getElementById('downloadAllBtn');
   const clearAllBtn = document.getElementById('clearAllBtn');
+  const shareBtn = document.getElementById('shareBtn');
   const toastContainer = document.getElementById('toastContainer');
 
   // --- 1. THEME MANAGEMENT ---
@@ -513,15 +514,50 @@
       });
     });
 
-    // FAQ Accordion
-    document.querySelectorAll('.faq-item').forEach(item => {
-      const q = item.querySelector('.faq-question');
-      q.addEventListener('click', () => {
-        const isOpen = item.classList.contains('open');
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-        if (!isOpen) item.classList.add('open');
+    // Share Website Button
+    if (shareBtn) {
+      shareBtn.addEventListener('click', () => {
+        const shareData = {
+          title: '56 File Converter',
+          text: 'Free, Unlimited & 100% Secure File Converter. All files auto-deleted after 1 minute.',
+          url: window.location.href
+        };
+        if (navigator.share) {
+          navigator.share(shareData).catch(err => {
+            if (err.name !== 'AbortError') {
+              copyLinkToClipboard();
+            }
+          });
+        } else {
+          copyLinkToClipboard();
+        }
       });
-    });
+    }
+
+    function copyLinkToClipboard() {
+      const url = window.location.href;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url)
+          .then(() => showToast('Website link copied to clipboard!', 'success'))
+          .catch(() => fallbackCopy(url));
+      } else {
+        fallbackCopy(url);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const input = document.createElement('input');
+      input.value = text;
+      document.body.appendChild(input);
+      input.select();
+      try {
+        document.execCommand('copy');
+        showToast('Website link copied to clipboard!', 'success');
+      } catch (err) {
+        showToast('Could not copy link.', 'error');
+      }
+      document.body.removeChild(input);
+    }
 
     // Formats directory filter tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {

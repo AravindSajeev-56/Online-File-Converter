@@ -20,18 +20,18 @@
 </head>
 <body>
 
+  <!-- Floating Liquid Background Glow Orbs -->
+  <div class="liquid-bg-orb orb-1"></div>
+  <div class="liquid-bg-orb orb-2"></div>
+  <div class="liquid-bg-orb orb-3"></div>
+
   <!-- App Header -->
   <header class="header">
     <div class="container header-content">
-      <a href="/" class="brand" aria-label="56 File Converter Home">
-        <div class="brand-title">
-          <span class="badge-num">56</span> File Converter
-        </div>
-      </a>
-
-      <div class="header-actions">
-        <!-- Light/Dark Mode Switcher Button -->
-        <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle light and dark mode">
+      
+      <!-- Left Side: Light/Dark Mode Option -->
+      <div class="header-left">
+        <button id="themeToggle" class="theme-toggle-btn glass-btn" aria-label="Toggle light and dark mode">
           <!-- Sun icon (shown in dark mode) -->
           <svg class="sun-icon" style="display:none;" viewBox="0 0 24 24">
             <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.29 1.29c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.29 1.29c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.29-1.29zm-13.78 1.41l1.29-1.29c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.29 1.29c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0zm12.37-12.37l1.29-1.29c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.29 1.29c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0z"/>
@@ -43,13 +43,35 @@
           <span id="themeLabel">Dark Mode</span>
         </button>
       </div>
+
+      <!-- Center: Name of the Website -->
+      <div class="header-center">
+        <a href="/" class="brand" aria-label="56 File Converter Home">
+          <span class="brand-title">
+            <span class="badge-num">56</span> File Converter
+          </span>
+        </a>
+      </div>
+
+      <!-- Right Side: Share Website Link Option -->
+      <div class="header-right">
+        <button id="shareBtn" class="share-btn glass-btn" aria-label="Share this website link" title="Share 56 File Converter">
+          <svg class="share-icon" viewBox="0 0 24 24">
+            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/>
+          </svg>
+          <span>Share</span>
+        </button>
+      </div>
+
     </div>
   </header>
 
-  <!-- Main Hero -->
+  <!-- Main Container -->
   <main class="container">
+    
+    <!-- 1. Hero & Conversion Studio Card (Primary Priority) -->
     <section class="hero">
-      <div class="hero-badge">
+      <div class="hero-badge glass-pill">
         ✨ 100% Free &bull; No Limits &bull; 100% Secure
       </div>
       <h1 class="hero-title">
@@ -61,23 +83,23 @@
 
       <!-- Quick Conversion Shortcut Pills -->
       <div class="quick-pills">
-        <button class="pill-tag" data-from="docx" data-to="pdf">📄 Word to PDF</button>
-        <button class="pill-tag" data-from="pdf" data-to="docx">📑 PDF to Word</button>
-        <button class="pill-tag" data-from="jpg" data-to="png">🖼️ JPG to PNG</button>
-        <button class="pill-tag" data-from="png" data-to="webp">⚡ PNG to WebP</button>
-        <button class="pill-tag" data-from="xlsx" data-to="csv">📊 Excel to CSV</button>
-        <button class="pill-tag" data-from="csv" data-to="json">📋 CSV to JSON</button>
-        <button class="pill-tag" data-from="md" data-to="pdf">📝 Markdown to PDF</button>
+        <button class="pill-tag glass-pill" data-from="docx" data-to="pdf">📄 Word to PDF</button>
+        <button class="pill-tag glass-pill" data-from="pdf" data-to="docx">📑 PDF to Word</button>
+        <button class="pill-tag glass-pill" data-from="jpg" data-to="png">🖼️ JPG to PNG</button>
+        <button class="pill-tag glass-pill" data-from="png" data-to="webp">⚡ PNG to WebP</button>
+        <button class="pill-tag glass-pill" data-from="xlsx" data-to="csv">📊 Excel to CSV</button>
+        <button class="pill-tag glass-pill" data-from="csv" data-to="json">📋 CSV to JSON</button>
+        <button class="pill-tag glass-pill" data-from="md" data-to="pdf">📝 Markdown to PDF</button>
       </div>
     </section>
 
-    <!-- Interactive Converter Card -->
-    <section class="converter-card" id="converterApp">
+    <!-- Interactive Converter Glass Card -->
+    <section class="converter-card glass-panel" id="converterApp">
       
       <!-- Drag & Drop Upload Zone -->
-      <div class="dropzone" id="dropzone">
+      <div class="dropzone glass-dropzone" id="dropzone">
         <input type="file" id="fileInput" multiple style="display:none;" accept=".docx,.pdf,.txt,.md,.html,.jpg,.jpeg,.png,.webp,.bmp,.tiff,.tif,.gif,.ico,.xlsx,.csv,.json">
-        <div class="dropzone-icon-wrap">
+        <div class="dropzone-icon-wrap glass-icon-orb">
           <svg viewBox="0 0 24 24">
             <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
           </svg>
@@ -101,35 +123,95 @@
         <div class="queue-header">
           <div class="queue-title">
             <span>Files In Queue</span>
-            <span class="queue-count" id="queueCount">0 files</span>
+            <span class="queue-count glass-pill" id="queueCount">0 files</span>
           </div>
           <div class="batch-actions">
-            <button id="convertAllBtn" class="btn btn-primary">
+            <button id="convertAllBtn" class="btn btn-primary glass-btn-primary">
               <svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24">
                 <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
               </svg>
               Convert All
             </button>
-            <button id="downloadAllBtn" class="btn btn-success" style="display: none;">
+            <button id="downloadAllBtn" class="btn btn-success glass-btn-success" style="display: none;">
               <svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24">
                 <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
               </svg>
               Download All (.ZIP)
             </button>
-            <button id="clearAllBtn" class="btn btn-outline">Clear All</button>
+            <button id="clearAllBtn" class="btn btn-outline glass-btn">Clear All</button>
           </div>
         </div>
 
         <div class="queue-list" id="queueList">
-          <!-- Queued file items rendered here by JavaScript -->
+          <!-- Queued file items rendered dynamically by JavaScript -->
         </div>
       </div>
 
     </section>
 
-    <!-- Highlighted Features Section (100% Secure, Free, No Limit) -->
+    <!-- 2. Second Priority: How to Convert Tab / Section -->
+    <section class="steps-section" id="howItWorks">
+      <div class="section-header">
+        <div class="section-tag glass-pill">Simple 3-Step Process</div>
+        <h2 class="section-title">How To Convert In 3 Easy Steps</h2>
+        <p class="section-subtitle">Converting your files with 56 File Converter is fast and intuitive.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card glass-panel">
+          <div class="step-number">1</div>
+          <h3 class="step-title">Upload Your Files</h3>
+          <p class="step-desc">Drag &amp; drop your files directly into the liquid glass dropzone or click browse. Add single files or multiple files in a batch.</p>
+        </div>
+        <div class="step-card glass-panel">
+          <div class="step-number">2</div>
+          <h3 class="step-title">Select Target Format</h3>
+          <p class="step-desc">Pick your desired conversion type (PDF, DOCX, PNG, JPG, WebP, CSV, XLSX, etc.) from the smart target dropdown.</p>
+        </div>
+        <div class="step-card glass-panel">
+          <div class="step-number">3</div>
+          <h3 class="step-title">Instant Download</h3>
+          <p class="step-desc">Click Convert, then download your file immediately. All files are automatically and permanently deleted after 1 minute for 100% privacy.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Third Priority: Supported File Formats Section -->
+    <section class="formats-section" id="formats">
+      <div class="section-header">
+        <div class="section-tag glass-pill">Universal Compatibility</div>
+        <h2 class="section-title">Supported File Formats</h2>
+        <p class="section-subtitle">Full high-fidelity support for the most widely used document, image, and spreadsheet formats.</p>
+      </div>
+
+      <div class="formats-tabs">
+        <button class="tab-btn glass-pill active" data-tab="all">All Formats</button>
+        <button class="tab-btn glass-pill" data-tab="document">Documents</button>
+        <button class="tab-btn glass-pill" data-tab="image">Images</button>
+        <button class="tab-btn glass-pill" data-tab="data">Data &amp; Sheets</button>
+      </div>
+
+      <div class="format-matrix" id="formatMatrix">
+        <div class="matrix-item glass-panel" data-cat="document"><span class="matrix-pill">DOCX</span><div class="matrix-desc">Word Document &rarr; PDF, TXT, HTML</div></div>
+        <div class="matrix-item glass-panel" data-cat="document"><span class="matrix-pill">PDF</span><div class="matrix-desc">PDF File &rarr; DOCX, TXT, PNG, JPG</div></div>
+        <div class="matrix-item glass-panel" data-cat="document"><span class="matrix-pill">TXT</span><div class="matrix-desc">Text File &rarr; PDF, DOCX, HTML</div></div>
+        <div class="matrix-item glass-panel" data-cat="document"><span class="matrix-pill">MD</span><div class="matrix-desc">Markdown &rarr; HTML, PDF, DOCX, TXT</div></div>
+        <div class="matrix-item glass-panel" data-cat="document"><span class="matrix-pill">HTML</span><div class="matrix-desc">HTML Webpage &rarr; PDF, DOCX, TXT</div></div>
+        <div class="matrix-item glass-panel" data-cat="image"><span class="matrix-pill">JPG</span><div class="matrix-desc">JPEG Image &rarr; PNG, WEBP, PDF, ICO</div></div>
+        <div class="matrix-item glass-panel" data-cat="image"><span class="matrix-pill">PNG</span><div class="matrix-desc">PNG Image &rarr; JPG, WEBP, PDF, ICO</div></div>
+        <div class="matrix-item glass-panel" data-cat="image"><span class="matrix-pill">WEBP</span><div class="matrix-desc">WebP Image &rarr; JPG, PNG, PDF, GIF</div></div>
+        <div class="matrix-item glass-panel" data-cat="image"><span class="matrix-pill">BMP</span><div class="matrix-desc">Bitmap Image &rarr; JPG, PNG, WEBP, PDF</div></div>
+        <div class="matrix-item glass-panel" data-cat="image"><span class="matrix-pill">TIFF</span><div class="matrix-desc">TIFF Image &rarr; JPG, PNG, WEBP, PDF</div></div>
+        <div class="matrix-item glass-panel" data-cat="data"><span class="matrix-pill">XLSX</span><div class="matrix-desc">Excel Sheet &rarr; CSV, JSON, HTML, PDF</div></div>
+        <div class="matrix-item glass-panel" data-cat="data"><span class="matrix-pill">CSV</span><div class="matrix-desc">CSV Data &rarr; XLSX, JSON, HTML, PDF</div></div>
+        <div class="matrix-item glass-panel" data-cat="data"><span class="matrix-pill">JSON</span><div class="matrix-desc">JSON Data &rarr; CSV, XLSX, HTML</div></div>
+      </div>
+    </section>
+
+    <!-- 4. Fourth Priority: Why Choose 56 File Converter Section -->
     <section class="features-section" id="features">
       <div class="section-header">
+        <div class="section-tag glass-pill">Core Advantages</div>
         <h2 class="section-title">Why Choose 56 File Converter?</h2>
         <p class="section-subtitle">
           Engineered for speed, 100% security, and uncompromising quality. Everything you need to convert files online without hassles.
@@ -138,8 +220,8 @@
 
       <div class="features-grid">
         <!-- 1. 100% Free -->
-        <div class="feature-card">
-          <div class="feature-icon-box icon-free">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-box icon-free glass-icon-box">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
             </svg>
@@ -151,8 +233,8 @@
         </div>
 
         <!-- 2. No Limits -->
-        <div class="feature-card">
-          <div class="feature-icon-box icon-limit">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-box icon-limit glass-icon-box">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10zm-7 8l-4-4 1.41-1.41L11 15.17V8h2v7.17l2.59-2.58L17 14l-6 6z"/>
             </svg>
@@ -164,8 +246,8 @@
         </div>
 
         <!-- 3. 100% Secure & Auto-Delete -->
-        <div class="feature-card">
-          <div class="feature-icon-box icon-secure">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-box icon-secure glass-icon-box">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
             </svg>
@@ -177,8 +259,8 @@
         </div>
 
         <!-- 4. Lightning Fast -->
-        <div class="feature-card">
-          <div class="feature-icon-box icon-speed">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-box icon-speed glass-icon-box">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
             </svg>
@@ -190,8 +272,8 @@
         </div>
 
         <!-- 5. 50+ Formats -->
-        <div class="feature-card">
-          <div class="feature-icon-box icon-formats">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-box icon-formats glass-icon-box">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
             </svg>
@@ -203,8 +285,8 @@
         </div>
 
         <!-- 6. Original High Quality -->
-        <div class="feature-card">
-          <div class="feature-icon-box icon-quality">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-box icon-quality glass-icon-box">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
             </svg>
@@ -217,138 +299,25 @@
       </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="steps-section">
-      <div class="section-header">
-        <h2 class="section-title">How To Convert In 3 Easy Steps</h2>
-        <p class="section-subtitle">Converting files with 56 File Converter takes only a few clicks.</p>
-      </div>
-
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-number">1</div>
-          <h3 class="step-title">Upload Your Files</h3>
-          <p class="step-desc">Drag and drop your files or click to browse from your device. Add single files or an entire batch.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">2</div>
-          <h3 class="step-title">Select Target Format</h3>
-          <p class="step-desc">Choose from the automatically filtered list of compatible formats (PDF, DOCX, PNG, CSV, etc.).</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">3</div>
-          <h3 class="step-title">Download &amp; Enjoy</h3>
-          <p class="step-desc">Click Convert, and download your files immediately. All files are automatically deleted after 1 minute for total privacy.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Supported Formats Directory -->
-    <section class="formats-section">
-      <div class="section-header">
-        <h2 class="section-title">Supported File Formats</h2>
-        <p class="section-subtitle">Full support for the most widely used document, image, and spreadsheet file types.</p>
-      </div>
-
-      <div class="formats-tabs">
-        <button class="tab-btn active" data-tab="all">All Formats</button>
-        <button class="tab-btn" data-tab="document">Documents</button>
-        <button class="tab-btn" data-tab="image">Images</button>
-        <button class="tab-btn" data-tab="data">Data &amp; Sheets</button>
-      </div>
-
-      <div class="format-matrix" id="formatMatrix">
-        <div class="matrix-item" data-cat="document"><span class="matrix-pill">DOCX</span><div class="matrix-desc">Word Document &rarr; PDF, TXT, HTML</div></div>
-        <div class="matrix-item" data-cat="document"><span class="matrix-pill">PDF</span><div class="matrix-desc">PDF File &rarr; DOCX, TXT, PNG, JPG</div></div>
-        <div class="matrix-item" data-cat="document"><span class="matrix-pill">TXT</span><div class="matrix-desc">Text &rarr; PDF, DOCX, HTML</div></div>
-        <div class="matrix-item" data-cat="document"><span class="matrix-pill">MD</span><div class="matrix-desc">Markdown &rarr; HTML, PDF, DOCX, TXT</div></div>
-        <div class="matrix-item" data-cat="image"><span class="matrix-pill">JPG</span><div class="matrix-desc">JPEG &rarr; PNG, WEBP, PDF, ICO</div></div>
-        <div class="matrix-item" data-cat="image"><span class="matrix-pill">PNG</span><div class="matrix-desc">PNG Image &rarr; JPG, WEBP, PDF, ICO</div></div>
-        <div class="matrix-item" data-cat="image"><span class="matrix-pill">WEBP</span><div class="matrix-desc">WebP &rarr; JPG, PNG, PDF, GIF</div></div>
-        <div class="matrix-item" data-cat="image"><span class="matrix-pill">BMP</span><div class="matrix-desc">Bitmap &rarr; JPG, PNG, WEBP, PDF</div></div>
-        <div class="matrix-item" data-cat="data"><span class="matrix-pill">XLSX</span><div class="matrix-desc">Excel &rarr; CSV, JSON, HTML, PDF</div></div>
-        <div class="matrix-item" data-cat="data"><span class="matrix-pill">CSV</span><div class="matrix-desc">CSV &rarr; XLSX, JSON, HTML, PDF</div></div>
-        <div class="matrix-item" data-cat="data"><span class="matrix-pill">JSON</span><div class="matrix-desc">JSON &rarr; CSV, XLSX, HTML</div></div>
-      </div>
-    </section>
-
-    <!-- FAQ Accordion -->
-    <section class="faq-section">
-      <div class="section-header">
-        <h2 class="section-title">Frequently Asked Questions</h2>
-        <p class="section-subtitle">Everything you need to know about 56 File Converter.</p>
-      </div>
-
-      <div class="faq-list">
-        <div class="faq-item">
-          <div class="faq-question">
-            <span>Is 56 File Converter really free to use?</span>
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
-          </div>
-          <div class="faq-answer">
-            Yes, 100%! There are no hidden fees, no subscription plans, no watermarks added to your files, and you do not need to create an account.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span>Are my uploaded files safe and private?</span>
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
-          </div>
-          <div class="faq-answer">
-            Yes, 100% secure! We enforce strict zero-storage privacy. Your uploaded files are deleted immediately after conversion, and converted outputs are completely purged from everywhere (server, memory, and site) after 1 minute. No database or permanent storage is ever used, ensuring nobody else can ever access your data.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span>How long do converted files stay available?</span>
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
-          </div>
-          <div class="faq-answer">
-            For maximum privacy and security, files are available to download for exactly 1 minute after conversion. After 60 seconds, an automated cleaner permanently wipes them from the server and memory.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span>Are there any limits on file conversions?</span>
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
-          </div>
-          <div class="faq-answer">
-            No limits! You can convert as many files as you need throughout the day. We also support batch conversion so you can convert multiple files at once.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span>How does Light and Dark mode work?</span>
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
-          </div>
-          <div class="faq-answer">
-            Click the theme toggle button in the top right corner. The website adapts instantly with smooth color transitions, and your preferred theme is saved automatically in your browser.
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- Footer -->
-  <footer class="footer">
+  <footer class="footer glass-footer">
     <div class="container">
       <div class="footer-content">
         <div class="brand">
           <div class="brand-title"><span class="badge-num">56</span> File Converter</div>
         </div>
-        <div style="display: flex; gap: 24px; font-size: 0.85rem;">
+        <div class="footer-links">
+          <a href="#howItWorks">How To Convert</a>
+          <a href="#formats">Supported Formats</a>
+          <a href="#features">Why 56 File Converter</a>
           <a href="#converterApp">Convert Files</a>
-          <a href="#features">Features</a>
-          <a href="#formatMatrix">Supported Formats</a>
         </div>
       </div>
       <div class="footer-bottom">
         <div>&copy; 2026 <strong>56 File Converter</strong>. All rights reserved. 100% Free &amp; 100% Secure.</div>
-        <div>Zero Data Retention &bull; Auto-deleted after 1 minute.</div>
+        <div>Zero Data Retention &bull; Files auto-deleted after 1 minute.</div>
       </div>
     </div>
   </footer>
