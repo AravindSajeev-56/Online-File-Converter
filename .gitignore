@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+venv/
+env/
+
+# Storage & Temporary files
+storage/uploads/*
+storage/converted/*
+!storage/uploads/.gitkeep
+!storage/converted/.gitkeep
+
+# Testing scratch
+scratch_test_files/
+scratch_test_out/
+*.tmp
