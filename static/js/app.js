@@ -412,14 +412,21 @@
           body: formData
         });
       } catch (networkErr) {
-        throw new Error('Could not connect to conversion server. Please make sure the server is running.');
+        throw new Error('Could not connect to conversion server. Please ensure the server is running on your device (or deployed to the cloud).');
       }
 
       let result;
+      const rawText = await response.text();
       try {
-        result = await response.json();
+        result = JSON.parse(rawText);
       } catch (jsonErr) {
-        throw new Error(`Server returned error (HTTP ${response.status})`);
+        if (response.status === 500) {
+          throw new Error('Server encountered an internal error. Please make sure the backend server is running properly.');
+        } else if (response.status === 502 || response.status === 503 || response.status === 504) {
+          throw new Error('Server is currently offline or unreachable. Please keep the server running on your device or deploy to cloud hosting.');
+        } else {
+          throw new Error(`Server returned error (HTTP ${response.status})`);
+        }
       }
 
       if (!response.ok || !result.success) {

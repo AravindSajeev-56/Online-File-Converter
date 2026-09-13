@@ -153,6 +153,25 @@ class TestConverters(unittest.TestCase):
         txt_pdf_out = convert_file(self.txt_path, "txt", "pdf", OUT_DIR)
         self.assertTrue(os.path.exists(txt_pdf_out))
 
+    def test_empty_and_unusual_docx(self):
+        """Verify converter gracefully handles empty or unusual DOCX files without crashing."""
+        empty_docx = os.path.join(TEST_DIR, "empty.docx")
+        doc = docx.Document()
+        doc.save(empty_docx)
+
+        # Empty docx to PDF
+        pdf_out = convert_file(empty_docx, "docx", "pdf", OUT_DIR)
+        self.assertTrue(os.path.exists(pdf_out))
+        self.assertTrue(os.path.getsize(pdf_out) > 0)
+
+        # Empty docx to TXT
+        txt_out = convert_file(empty_docx, "docx", "txt", OUT_DIR)
+        self.assertTrue(os.path.exists(txt_out))
+
+        # Empty docx to HTML
+        html_out = convert_file(empty_docx, "docx", "html", OUT_DIR)
+        self.assertTrue(os.path.exists(html_out))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -298,6 +298,38 @@ def api_download_all():
     })
 
 
+@app.errorhandler(400)
+def bad_request(e):
+    return jsonify({"error": getattr(e, "description", "Bad Request")}), 400
+
+
+@app.errorhandler(404)
+def not_found(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"error": getattr(e, "description", "Endpoint or resource not found")}), 404
+    return render_template("index.html"), 200
+
+
+@app.errorhandler(413)
+def file_too_large(e):
+    return jsonify({"error": "File size exceeds the 100MB limit. Please upload a smaller file."}), 413
+
+
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({"error": "Internal server error occurred during processing. Please try again."}), 500
+
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        return jsonify({"error": e.description}), e.code
+    import traceback
+    traceback.print_exc()
+    return jsonify({"error": f"Server processing error: {str(e)}"}), 500
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     print("=================================================")

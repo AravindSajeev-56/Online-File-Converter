@@ -65,6 +65,23 @@ Then open **[http://127.0.0.1:5000](http://127.0.0.1:5000)** in your web browser
 
 ---
 
+## 🌐 Free 24/7 Online Deployment (Render.com)
+
+To make your converter accessible to anyone on the internet 24/7—even when your personal computer is turned off:
+
+1. Create a free account at **[Render.com](https://render.com/)**.
+2. Click **New +** &rarr; **Web Service**.
+3. Select your GitHub repository: `AravindSajeev-56/Online-File-Converter`.
+4. Configure settings:
+   - **Environment**: `Python`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120`
+5. Click **Create Web Service**.
+
+Render will automatically build and host your website with a free HTTPS URL (e.g. `https://online-file-converter-56.onrender.com`) that stays online 24/7!
+
+---
+
 ## 🧪 Running Automated Tests
 
 ```bash

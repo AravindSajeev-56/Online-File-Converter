@@ -43,9 +43,76 @@ def _build_pdf_from_elements(story: list, output_path: str):
     doc.build(story)
 
 
+def _text_to_pdf_pymupdf(text: str, output_path: str):
+    """Fail-safe: create a clean, readable PDF from plain text using PyMuPDF."""
+    doc = pymupdf.open()
+    page_w, page_h = 612, 792  # letter
+    margin = 54
+    rect = pymupdf.Rect(margin, margin, page_w - margin, page_h - margin)
+
+    lines = [line.strip() for line in (text or "Empty document").splitlines()]
+    lines = [l for l in lines if l] or ["Empty document"]
+
+    chunk_size = 45
+    for i in range(0, len(lines), chunk_size):
+        chunk = "\n".join(lines[i:i + chunk_size])
+        page = doc.new_page(width=page_w, height=page_h)
+        page.insert_textbox(rect, chunk, fontsize=10, fontname="helv")
+
+    doc.save(output_path)
+    doc.close()
+
+
+def _extract_text_from_docx_safely(input_path: str) -> str:
+    """Extract all readable text from DOCX via python-docx or raw XML fallback."""
+    try:
+        source_doc = docx.Document(input_path)
+        lines = []
+        for p in source_doc.paragraphs:
+            if p.text.strip():
+                lines.append(p.text.strip())
+        for tbl in source_doc.tables:
+            for row in tbl.rows:
+                cell_texts = [c.text.strip() for c in row.cells if c.text.strip()]
+                if cell_texts:
+                    lines.append(" | ".join(cell_texts))
+        if lines:
+            return "\n\n".join(lines)
+    except Exception:
+        pass
+
+    try:
+        import xml.etree.ElementTree as ET
+        with zipfile.ZipFile(input_path) as z:
+            if "word/document.xml" in z.namelist():
+                xml_content = z.read("word/document.xml")
+                tree = ET.fromstring(xml_content)
+                texts = []
+                for node in tree.iter():
+                    if node.tag.endswith('}t') and node.text:
+                        texts.append(node.text)
+                    elif node.tag.endswith('}p'):
+                        texts.append("\n")
+                raw = "".join(texts).strip()
+                if raw:
+                    return raw
+    except Exception:
+        pass
+
+    return "Document content empty or unreadable"
+
+
 def docx_to_pdf(input_path: str, output_path: str) -> str:
-    """Convert DOCX file to PDF using python-docx and reportlab."""
-    source_doc = docx.Document(input_path)
+    """Convert DOCX file to PDF using python-docx and reportlab, with PyMuPDF fail-safe."""
+    source_doc = None
+    try:
+        source_doc = docx.Document(input_path)
+    except Exception:
+        # Fallback to direct raw extraction + PyMuPDF if python-docx cannot parse file
+        text = _extract_text_from_docx_safely(input_path)
+        _text_to_pdf_pymupdf(text, output_path)
+        return output_path
+
     styles = getSampleStyleSheet()
     
     # Custom styles
@@ -91,71 +158,89 @@ def docx_to_pdf(input_path: str, output_path: str) -> str:
 
     story = []
     
-    # Process document body
-    for element in source_doc.element.body:
-        tag = element.tag.split('}')[-1]
-        
-        if tag == 'p':
-            # It's a paragraph
-            p = docx.text.paragraph.Paragraph(element, source_doc)
-            raw_text = p.text.strip()
-            if not raw_text:
-                story.append(Spacer(1, 6))
-                continue
+    # Process document body safely
+    try:
+        for element in source_doc.element.body:
+            tag = element.tag.split('}')[-1]
             
-            clean_text = _sanitize_text_for_reportlab(raw_text)
-            p_style = p.style.name.lower() if p.style and p.style.name else ""
-            
-            if 'heading 1' in p_style or 'title' in p_style:
-                story.append(Paragraph(clean_text, h1_style))
-            elif 'heading 2' in p_style:
-                story.append(Paragraph(clean_text, h2_style))
-            elif 'heading 3' in p_style:
-                story.append(Paragraph(clean_text, h3_style))
-            else:
-                story.append(Paragraph(clean_text, body_style))
-                
-        elif tag == 'tbl':
-            # It's a table
-            table = docx.table.Table(element, source_doc)
-            table_data = []
-            for row in table.rows:
-                row_cells = []
-                for cell in row.cells:
-                    row_cells.append(Paragraph(_sanitize_text_for_reportlab(cell.text.strip()), body_style))
-                table_data.append(row_cells)
-                
-            if table_data:
-                col_count = max(len(row) for row in table_data) if table_data else 1
-                for row in table_data:
-                    while len(row) < col_count:
-                        row.append(Paragraph("", body_style))
-                available_width = letter[0] - 108
-                col_width = available_width / max(col_count, 1)
-                
-                t = Table(table_data, colWidths=[col_width] * col_count)
-                t.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f3f4f6')),
-                    ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#1f2937')),
-                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                    ('TOPPADDING', (0, 0), (-1, -1), 6),
-                    ('LEFTPADDING', (0, 0), (-1, -1), 6),
-                    ('RIGHTPADDING', (0, 0), (-1, -1), 6),
-                    ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
-                ]))
-                story.append(Spacer(1, 8))
-                story.append(t)
-                story.append(Spacer(1, 8))
+            if tag == 'p':
+                try:
+                    p = docx.text.paragraph.Paragraph(element, source_doc)
+                    raw_text = p.text.strip()
+                    if not raw_text:
+                        story.append(Spacer(1, 6))
+                        continue
+                    
+                    clean_text = _sanitize_text_for_reportlab(raw_text)
+                    p_style = ""
+                    try:
+                        if p.style and p.style.name:
+                            p_style = p.style.name.lower()
+                    except Exception:
+                        p_style = ""
+                    
+                    if 'heading 1' in p_style or 'title' in p_style:
+                        story.append(Paragraph(clean_text, h1_style))
+                    elif 'heading 2' in p_style:
+                        story.append(Paragraph(clean_text, h2_style))
+                    elif 'heading 3' in p_style:
+                        story.append(Paragraph(clean_text, h3_style))
+                    else:
+                        story.append(Paragraph(clean_text, body_style))
+                except Exception:
+                    continue
+                    
+            elif tag == 'tbl':
+                try:
+                    table = docx.table.Table(element, source_doc)
+                    table_data = []
+                    for row in table.rows:
+                        row_cells = []
+                        for cell in row.cells:
+                            row_cells.append(Paragraph(_sanitize_text_for_reportlab(cell.text.strip()), body_style))
+                        table_data.append(row_cells)
+                        
+                    if table_data:
+                        col_count = max(len(row) for row in table_data) if table_data else 1
+                        for row in table_data:
+                            while len(row) < col_count:
+                                row.append(Paragraph("", body_style))
+                        available_width = letter[0] - 108
+                        col_width = available_width / max(col_count, 1)
+                        
+                        t = Table(table_data, colWidths=[col_width] * col_count)
+                        t.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f3f4f6')),
+                            ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#1f2937')),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                            ('TOPPADDING', (0, 0), (-1, -1), 6),
+                            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+                            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+                            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
+                        ]))
+                        story.append(Spacer(1, 8))
+                        story.append(t)
+                        story.append(Spacer(1, 8))
+                except Exception:
+                    continue
+    except Exception:
+        pass
 
     if not story:
         story.append(Paragraph("Empty document", body_style))
 
+    # Tier 1: Build full structured PDF with ReportLab
     try:
         _build_pdf_from_elements(story, output_path)
+        if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+            return output_path
     except Exception:
-        # Fallback text rendering
+        pass
+
+    # Tier 2: Fallback paragraph text with ReportLab
+    try:
         fallback_story = []
         for p in source_doc.paragraphs:
             txt = _sanitize_text_for_reportlab(p.text.strip())
@@ -165,7 +250,14 @@ def docx_to_pdf(input_path: str, output_path: str) -> str:
         if not fallback_story:
             fallback_story.append(Paragraph("Empty document", body_style))
         _build_pdf_from_elements(fallback_story, output_path)
+        if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+            return output_path
+    except Exception:
+        pass
 
+    # Tier 3: Guaranteed PyMuPDF fail-safe
+    text = _extract_text_from_docx_safely(input_path)
+    _text_to_pdf_pymupdf(text, output_path)
     return output_path
 
 
@@ -181,7 +273,12 @@ def pdf_to_docx(input_path: str, output_path: str) -> str:
             import gc
             gc.collect()
         if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
-            return output_path
+            try:
+                chk = docx.Document(output_path)
+                if any(p.text.strip() for p in chk.paragraphs) or len(chk.tables) > 0:
+                    return output_path
+            except Exception:
+                pass
     except Exception:
         pass
 
@@ -189,14 +286,18 @@ def pdf_to_docx(input_path: str, output_path: str) -> str:
     doc = pymupdf.open(input_path)
     try:
         new_doc = docx.Document()
+        has_any_text = False
         for i, page in enumerate(doc):
             if i > 0:
                 new_doc.add_page_break()
             txt = page.get_text()
             if txt.strip():
+                has_any_text = True
                 for line in txt.splitlines():
                     if line.strip():
                         new_doc.add_paragraph(line)
+        if not has_any_text:
+            new_doc.add_paragraph("(No selectable text found in source PDF)")
         new_doc.save(output_path)
     finally:
         doc.close()
@@ -282,43 +383,66 @@ def pdf_to_html(input_path: str, output_path: str) -> str:
 
 
 def docx_to_txt(input_path: str, output_path: str) -> str:
-    """Extract plain text from DOCX."""
-    doc = docx.Document(input_path)
-    lines = []
-    for p in doc.paragraphs:
-        lines.append(p.text)
-    for table in doc.tables:
-        for row in table.rows:
-            lines.append(" | ".join(c.text.strip() for c in row.cells))
+    """Extract plain text from DOCX with robust fallback."""
+    try:
+        doc = docx.Document(input_path)
+        lines = []
+        for p in doc.paragraphs:
+            lines.append(p.text)
+        for table in doc.tables:
+            for row in table.rows:
+                lines.append(" | ".join(c.text.strip() for c in row.cells))
+        if lines and any(l.strip() for l in lines):
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
+            return output_path
+    except Exception:
+        pass
+
+    fallback_text = _extract_text_from_docx_safely(input_path)
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
+        f.write(fallback_text)
     return output_path
 
 
 def docx_to_html(input_path: str, output_path: str) -> str:
     """Convert DOCX to HTML document."""
-    doc = docx.Document(input_path)
     body_html = []
-    for p in doc.paragraphs:
-        txt = html.escape(p.text)
-        if not txt.strip():
-            continue
-        style = p.style.name.lower() if p.style and p.style.name else ""
-        if 'heading 1' in style or 'title' in style:
-            body_html.append(f"<h1>{txt}</h1>")
-        elif 'heading 2' in style:
-            body_html.append(f"<h2>{txt}</h2>")
-        elif 'heading 3' in style:
-            body_html.append(f"<h3>{txt}</h3>")
-        else:
-            body_html.append(f"<p>{txt}</p>")
+    try:
+        doc = docx.Document(input_path)
+        for p in doc.paragraphs:
+            txt = html.escape(p.text)
+            if not txt.strip():
+                continue
+            style = ""
+            try:
+                if p.style and p.style.name:
+                    style = p.style.name.lower()
+            except Exception:
+                style = ""
+            if 'heading 1' in style or 'title' in style:
+                body_html.append(f"<h1>{txt}</h1>")
+            elif 'heading 2' in style:
+                body_html.append(f"<h2>{txt}</h2>")
+            elif 'heading 3' in style:
+                body_html.append(f"<h3>{txt}</h3>")
+            else:
+                body_html.append(f"<p>{txt}</p>")
 
-    for table in doc.tables:
-        rows_html = []
-        for row in table.rows:
-            cells = "".join(f"<td>{html.escape(c.text.strip())}</td>" for c in row.cells)
-            rows_html.append(f"<tr>{cells}</tr>")
-        body_html.append(f"<table border='1' cellpadding='6' cellspacing='0'>{''.join(rows_html)}</table>")
+        for table in doc.tables:
+            rows_html = []
+            for row in table.rows:
+                cells = "".join(f"<td>{html.escape(c.text.strip())}</td>" for c in row.cells)
+                rows_html.append(f"<tr>{cells}</tr>")
+            body_html.append(f"<table border='1' cellpadding='6' cellspacing='0'>{''.join(rows_html)}</table>")
+    except Exception:
+        fallback_text = _extract_text_from_docx_safely(input_path)
+        for paragraph in fallback_text.split("\n\n"):
+            if paragraph.strip():
+                body_html.append(f"<p>{html.escape(paragraph.strip())}</p>")
+
+    if not body_html:
+        body_html.append("<p>Empty document</p>")
 
     full_html = f"""<!DOCTYPE html>
 <html lang="en">
