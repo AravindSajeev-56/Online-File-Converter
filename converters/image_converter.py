@@ -36,7 +36,9 @@ def convert_image(input_path: str, source_ext: str, target_ext: str, output_dir:
         except Exception:
             pass
 
-        # Target requires RGB (no alpha channel)
+        # Convert non-standard color spaces (CMYK, YCbCr) to RGB
+        if img.mode in ("CMYK", "YCbCr"):
+            img = img.convert("RGB")
         if target_ext in ["jpg", "jpeg", "bmp", "pdf"]:
             if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
                 # Create a solid white background and paste alpha image on top

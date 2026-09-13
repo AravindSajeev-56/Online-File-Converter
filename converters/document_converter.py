@@ -24,7 +24,8 @@ def _sanitize_text_for_reportlab(text: str) -> str:
     """Escape XML characters and clean text for ReportLab Paragraphs."""
     if not text:
         return ""
-    # ReportLab paragraphs accept HTML/XML tags, so raw text needs escaping
+    # Strip non-printable/control characters that break ReportLab
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
     escaped = html.escape(text)
     return escaped
 
@@ -125,7 +126,10 @@ def docx_to_pdf(input_path: str, output_path: str) -> str:
                 table_data.append(row_cells)
                 
             if table_data:
-                col_count = len(table_data[0]) if table_data else 1
+                col_count = max(len(row) for row in table_data) if table_data else 1
+                for row in table_data:
+                    while len(row) < col_count:
+                        row.append(Paragraph("", body_style))
                 available_width = letter[0] - 108
                 col_width = available_width / max(col_count, 1)
                 
@@ -148,18 +152,56 @@ def docx_to_pdf(input_path: str, output_path: str) -> str:
     if not story:
         story.append(Paragraph("Empty document", body_style))
 
-    _build_pdf_from_elements(story, output_path)
+    try:
+        _build_pdf_from_elements(story, output_path)
+    except Exception:
+        # Fallback text rendering
+        fallback_story = []
+        for p in source_doc.paragraphs:
+            txt = _sanitize_text_for_reportlab(p.text.strip())
+            if txt:
+                fallback_story.append(Paragraph(txt, body_style))
+                fallback_story.append(Spacer(1, 6))
+        if not fallback_story:
+            fallback_story.append(Paragraph("Empty document", body_style))
+        _build_pdf_from_elements(fallback_story, output_path)
+
     return output_path
 
 
 def pdf_to_docx(input_path: str, output_path: str) -> str:
-    """Convert PDF file to DOCX using pdf2docx."""
-    from pdf2docx import Converter
-    cv = Converter(input_path)
+    """Convert PDF file to DOCX using pdf2docx with PyMuPDF text fallback."""
     try:
-        cv.convert(output_path)
+        from pdf2docx import Converter
+        cv = Converter(input_path)
+        try:
+            cv.convert(output_path)
+        finally:
+            cv.close()
+            import gc
+            gc.collect()
+        if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+            return output_path
+    except Exception:
+        pass
+
+    # Fallback: extract pages text via PyMuPDF into docx
+    doc = pymupdf.open(input_path)
+    try:
+        new_doc = docx.Document()
+        for i, page in enumerate(doc):
+            if i > 0:
+                new_doc.add_page_break()
+            txt = page.get_text()
+            if txt.strip():
+                for line in txt.splitlines():
+                    if line.strip():
+                        new_doc.add_paragraph(line)
+        new_doc.save(output_path)
     finally:
-        cv.close()
+        doc.close()
+        import gc
+        gc.collect()
     return output_path
 
 

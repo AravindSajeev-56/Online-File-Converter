@@ -6,7 +6,26 @@
   'use strict';
 
   // --- STATE ---
-  let conversionMap = {};
+  const DEFAULT_CONVERSION_MAP = {
+    "docx": ["pdf", "txt", "html"],
+    "pdf": ["docx", "txt", "png", "jpg", "html"],
+    "txt": ["pdf", "docx", "html"],
+    "md": ["html", "pdf", "docx", "txt"],
+    "html": ["pdf", "docx", "txt"],
+    "jpg": ["png", "webp", "bmp", "gif", "tiff", "pdf", "ico"],
+    "jpeg": ["png", "webp", "bmp", "gif", "tiff", "pdf", "ico"],
+    "png": ["jpg", "webp", "bmp", "gif", "tiff", "pdf", "ico"],
+    "webp": ["jpg", "png", "bmp", "gif", "tiff", "pdf", "ico"],
+    "bmp": ["jpg", "png", "webp", "gif", "tiff", "pdf"],
+    "tiff": ["jpg", "png", "webp", "bmp", "pdf"],
+    "tif": ["jpg", "png", "webp", "bmp", "pdf"],
+    "gif": ["png", "jpg", "webp"],
+    "ico": ["png", "jpg", "webp"],
+    "xlsx": ["csv", "json", "html", "pdf"],
+    "csv": ["xlsx", "json", "html", "pdf"],
+    "json": ["csv", "xlsx", "html"]
+  };
+  let conversionMap = Object.assign({}, DEFAULT_CONVERSION_MAP);
   let formatMetadata = {};
   let fileQueue = [];
   let nextQueueId = 1;
@@ -377,20 +396,31 @@
     item.progress = 20;
     renderQueue();
 
+    const target = (item.targetFormat || (item.targets && item.targets[0]) || 'pdf').toLowerCase();
     const formData = new FormData();
     formData.append('file', item.file);
-    formData.append('target_format', item.targetFormat);
+    formData.append('target_format', target);
 
     try {
       item.progress = 50;
       updateProgressBar(id, 50);
 
-      const response = await fetch('/api/convert', {
-        method: 'POST',
-        body: formData
-      });
+      let response;
+      try {
+        response = await fetch('/api/convert', {
+          method: 'POST',
+          body: formData
+        });
+      } catch (networkErr) {
+        throw new Error('Could not connect to conversion server. Please make sure the server is running.');
+      }
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (jsonErr) {
+        throw new Error(`Server returned error (HTTP ${response.status})`);
+      }
 
       if (!response.ok || !result.success) {
         throw new Error(result.error || 'Conversion failed');

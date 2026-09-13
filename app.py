@@ -125,35 +125,37 @@ def api_convert():
     Converted file is deleted after 1 minute (60 seconds).
     """
     if "file" not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
+        return jsonify({"error": "No file uploaded. Please select a file."}), 400
 
     uploaded_file = request.files["file"]
-    target_format = request.form.get("target_format", "").strip().lower()
-
     if not uploaded_file or uploaded_file.filename == "":
-        return jsonify({"error": "Empty filename provided"}), 400
+        return jsonify({"error": "No file selected."}), 400
 
-    raw_filename = secure_filename(uploaded_file.filename)
-    if not raw_filename:
-        raw_filename = f"file_{int(time.time())}"
-
-    _, ext = os.path.splitext(raw_filename)
-    source_ext = normalize_ext(ext)
+    original_filename = uploaded_file.filename
+    _, raw_ext = os.path.splitext(original_filename)
+    source_ext = normalize_ext(raw_ext)
 
     if not source_ext:
-        return jsonify({"error": "Could not determine file extension"}), 400
+        return jsonify({"error": f"Uploaded file '{original_filename}' does not have a recognizable file extension."}), 400
 
     if source_ext not in CONVERSION_MAP:
         return jsonify({"error": f"Format '.{source_ext}' is not currently supported."}), 400
 
     valid_targets = CONVERSION_MAP.get(source_ext, [])
-    if not target_format:
+    target_format = (request.form.get("target_format") or "").strip().lower().lstrip(".")
+    if target_format in ["", "undefined", "null", "none"]:
         target_format = valid_targets[0] if valid_targets else ""
 
     if target_format not in valid_targets:
         return jsonify({
             "error": f"Cannot convert from '.{source_ext}' to '.{target_format}'. Supported targets: {', '.join(valid_targets)}"
         }), 400
+
+    # Create safe base filename preserving extension
+    base_name = secure_filename(os.path.splitext(original_filename)[0])
+    if not base_name:
+        base_name = f"file_{int(time.time())}"
+    safe_filename = f"{base_name}.{source_ext}"
 
     # Create isolated directory for this job
     job_id = str(uuid.uuid4())
@@ -162,7 +164,7 @@ def api_convert():
     os.makedirs(job_upload_dir, exist_ok=True)
     os.makedirs(job_converted_dir, exist_ok=True)
 
-    input_path = os.path.join(job_upload_dir, raw_filename)
+    input_path = os.path.join(job_upload_dir, safe_filename)
     uploaded_file.save(input_path)
 
     try:
@@ -170,8 +172,15 @@ def api_convert():
         output_path = convert_file(input_path, source_ext, target_format, job_converted_dir)
         elapsed = round(time.time() - start_time, 3)
 
+        # Release Windows file handles
+        import gc
+        gc.collect()
+
         # 🔒 Maximum Privacy: Immediately delete the source uploaded file from server!
-        shutil.rmtree(job_upload_dir, ignore_errors=True)
+        try:
+            shutil.rmtree(job_upload_dir, ignore_errors=True)
+        except Exception:
+            pass
 
         output_filename = os.path.basename(output_path)
         output_size = os.path.getsize(output_path)
@@ -187,7 +196,7 @@ def api_convert():
         return jsonify({
             "success": True,
             "job_id": job_id,
-            "original_filename": raw_filename,
+            "original_filename": original_filename,
             "converted_filename": output_filename,
             "target_format": target_format,
             "download_url": f"/api/download/{job_id}",
@@ -197,9 +206,13 @@ def api_convert():
         })
 
     except Exception as e:
-        # Clean up both folders on failure
-        shutil.rmtree(job_upload_dir, ignore_errors=True)
-        shutil.rmtree(job_converted_dir, ignore_errors=True)
+        import traceback
+        traceback.print_exc()
+        try:
+            shutil.rmtree(job_upload_dir, ignore_errors=True)
+            shutil.rmtree(job_converted_dir, ignore_errors=True)
+        except Exception:
+            pass
         return jsonify({"error": f"Conversion failed: {str(e)}"}), 500
 
 
